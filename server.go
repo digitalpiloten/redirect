@@ -7,10 +7,9 @@ import (
 	"net"
 	"net/http"
 	"net/url"
-	"os"
 	"strings"
+	"time"
 
-	"github.com/gorilla/mux"
 	"github.com/mholt/certmagic"
 )
 
@@ -67,21 +66,39 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8081"
+	certmagic.Default.Agreed = true
+	// certmagic.Default.CA = certmagic.LetsEncryptStagingCA
+	certmagic.Default.OnDemand = new(certmagic.OnDemandConfig)
+	magic := certmagic.NewDefault()
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", handler)
+
+	httpSrv := &http.Server{
+		Handler:      magic.HTTPChallengeHandler(mux),
+		Addr:         ":80",
+		ReadTimeout:  2 * time.Second,
+		WriteTimeout: 2 * time.Second,
 	}
 
-	r := mux.NewRouter()
-	r.HandleFunc("/", handler)
-
-	certmagic.Default.OnDemand = &certmagic.OnDemandConfig{
-		DecisionFunc: func(name string) error {
-			return nil
-		},
+	httpsSrv := &http.Server{
+		Handler:      mux,
+		Addr:         ":443",
+		TLSConfig:    magic.TLSConfig(),
+		ReadTimeout:  2 * time.Second,
+		WriteTimeout: 2 * time.Second,
 	}
 
-	certmagic.HTTPS(nil, r)
+	ln, err := certmagic.Listen([]string{})
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	log.Printf("Listening on http://127.0.0.1:%s", port)
+	go func() {
+		log.Printf("Listening on http://0.0.0.0:80")
+		log.Fatal(httpSrv.ListenAndServe())
+	}()
+
+	log.Printf("Listening on https://0.0.0.0:443")
+	log.Fatal(httpsSrv.Serve(ln))
 }
