@@ -81,7 +81,7 @@ func main() {
 		},
 	}
 
-	certmagic.HTTPS([]string{"beta1.marvsh.marvnet.de"}, r)
+	certmagic.HTTPS(nil, r)
 
 	log.Printf("Listening on http://127.0.0.1:%s", port)
 }
