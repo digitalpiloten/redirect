@@ -1,0 +1,2 @@
+# Redirect
+**Redirect by DigitalPiloten** is a simple forwarding service based on pure DNS that requires no database or registration, but still supports HTTPS (through [Let's Encrypt](https://letsencrypt.org)).

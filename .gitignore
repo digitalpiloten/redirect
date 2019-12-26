@@ -1,8 +1,5 @@
 .DS_Store
 
-# ignore docs repo
-docs/
-
 # ignore build artifacts
 redirect.name
 server
