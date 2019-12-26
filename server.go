@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/mholt/certmagic"
+	"github.com/securityclippy/magicstorage"
 )
 
 func fallback(w http.ResponseWriter, r *http.Request, reason string) {
@@ -69,6 +70,7 @@ func main() {
 	certmagic.Default.Agreed = true
 	// certmagic.Default.CA = certmagic.LetsEncryptStagingCA
 	certmagic.Default.OnDemand = new(certmagic.OnDemandConfig)
+	certmagic.Default.Storage = magicstorage.NewS3Storage("certpool", "eu-central-1")
 	magic := certmagic.NewDefault()
 
 	mux := http.NewServeMux()
