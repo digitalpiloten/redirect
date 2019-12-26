@@ -9,7 +9,9 @@ import (
 	"net/url"
 	"os"
 	"strings"
-	"time"
+
+	"github.com/gorilla/mux"
+	"github.com/mholt/certmagic"
 )
 
 func fallback(w http.ResponseWriter, r *http.Request, reason string) {
@@ -70,13 +72,16 @@ func main() {
 		port = "8081"
 	}
 
-	http.HandleFunc("/", handler)
-	srv := &http.Server{
-		Addr:         ":" + port,
-		ReadTimeout:  2 * time.Second,
-		WriteTimeout: 2 * time.Second,
+	r := mux.NewRouter()
+	r.HandleFunc("/", handler)
+
+	certmagic.Default.OnDemand = &certmagic.OnDemandConfig{
+		DecisionFunc: func(name string) error {
+			return nil
+		},
 	}
 
+	certmagic.HTTPS([]string{"beta1.marvsh.marvnet.de"}, r)
+
 	log.Printf("Listening on http://127.0.0.1:%s", port)
-	log.Fatal(srv.ListenAndServe())
 }

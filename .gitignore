@@ -6,3 +6,5 @@ docs/
 # ignore build artifacts
 redirect.name
 server
+
+redirect
