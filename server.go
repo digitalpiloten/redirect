@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"time"
 
 	"github.com/mholt/certmagic"
 	"github.com/securityclippy/magicstorage"
@@ -77,18 +76,18 @@ func main() {
 	mux.HandleFunc("/", handler)
 
 	httpSrv := &http.Server{
-		Handler:      magic.HTTPChallengeHandler(mux),
-		Addr:         ":80",
-		ReadTimeout:  2 * time.Second,
-		WriteTimeout: 2 * time.Second,
+		Handler: magic.HTTPChallengeHandler(mux),
+		Addr:    ":80",
+		// ReadTimeout:  2 * time.Second,
+		// WriteTimeout: 2 * time.Second,
 	}
 
 	httpsSrv := &http.Server{
-		Handler:      mux,
-		Addr:         ":443",
-		TLSConfig:    magic.TLSConfig(),
-		ReadTimeout:  2 * time.Second,
-		WriteTimeout: 2 * time.Second,
+		Handler:   mux,
+		Addr:      ":443",
+		TLSConfig: magic.TLSConfig(),
+		// ReadTimeout:  2 * time.Second,
+		// WriteTimeout: 2 * time.Second,
 	}
 
 	ln, err := certmagic.Listen([]string{})
